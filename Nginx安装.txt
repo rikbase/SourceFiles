@@ -1,0 +1,4 @@
+negix 安装
+
+yum install gcc-c++
+yum install -y pcre pcre-devel

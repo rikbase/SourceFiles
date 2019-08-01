@@ -1,0 +1,19 @@
+HBASE SHELL 常用命令
+创建，新增，编辑，删除，查看表结果等都可以通过 help 命令查看详细规则；
+
+hbase查询scan 扫描 与 FILTER 结合使用
+1、行值 = 【】
+scan 'hbase_user_phone_record', FILTER=>"ValueFilter(=,'binary:【】')"
+2、行值包含【】 
+scan 'hbase_user_phone_record', FILTER=>"ValueFilter(=,'substring:【】')"
+3、column值【1】和行值包含【2】
+scan 'hbase_user_phone_record', FILTER=>"ColumnPrefixFilter('【1】') AND ValueFilter(=,'substring:【2】')"
+example:
+scan 'hbase_user_phone_record', FILTER=>"ColumnPrefixFilter('endTime') AND ValueFilter(=,'substring:2019-02-08 06')"
+4、rowkey为【】开头的
+scan 'hbase_user_phone_record', FILTER => "PrefixFilter ('【】')"  
+5、从某个rowkey 【】开始,找到所有的rowkey以【】开头的
+scan 'hbase_user_phone_record', {STARTROW=>'18840810340_20190208063843', FILTER => "PrefixFilter ('18840810340')"} 
+
+hbase shell api
+待续------------------------

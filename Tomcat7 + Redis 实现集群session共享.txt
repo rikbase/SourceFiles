@@ -1,0 +1,20 @@
+Tomcat7 + Redis 实现集群session共享
+
+所需jar包：
+
+tomcat-redis-session-manager-1.2-tomcat-7.jar
+https://github.com/jcoleman/tomcat-redis-session-manager/downloads
+jedis-2.9.0
+commons-pool2-2.4.2
+
+将以上3个jar包放入tomcat/lib目录中
+
+
+修改conf/context.xml文件
+	<Valve className="com.radiadesign.catalina.session.RedisSessionHandlerValve" /> 
+	<Manager className="com.radiadesign.catalina.session.RedisSessionManager"
+	host="192.168.233.128"
+	port="6379"
+	database="0"
+	password="redis_rikbase"
+	maxInactiveInterval="60" />

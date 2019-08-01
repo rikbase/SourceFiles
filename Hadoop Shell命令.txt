@@ -1,0 +1,18 @@
+Hadoop Shell命令
+http://hadoop.apache.org/docs/r1.0.4/cn/hdfs_shell.html
+hadoop fs -cat URI [URI …]		将路径指定文件的内容输出到stdout。
+hadoop fs -chgrp [-R] GROUP URI [URI …]		改变文件所属的组。使用-R将使改变在目录结构下递归进行。命令的使用者必须是文件的所有者或者超级用户。
+hadoop fs -chmod [-R] <MODE[,MODE]... | OCTALMODE> URI [URI …]		改变文件的权限。使用-R将使改变在目录结构下递归进行。命令的使用者必须是文件的所有者或者超级用户.
+hadoop fs -chown [-R] [OWNER][:[GROUP]] URI [URI ]		改变文件的拥有者。使用-R将使改变在目录结构下递归进行。命令的使用者必须是超级用户。
+hadoop fs -cp URI [URI …] <dest>		将文件从源路径复制到目标路径。这个命令允许有多个源路径，此时目标路径必须是一个目录。 
+hadoop fs -du URI [URI …]		显示目录中所有文件的大小，或者当只指定一个文件时，显示此文件的大小。
+hadoop fs -dus <args>		显示文件的大小。
+hadoop fs -expunge		清空回收站。
+hadoop fs -get [-ignorecrc] [-crc] <src> <localdst>		复制文件到本地文件系统。可用-ignorecrc选项复制CRC校验失败的文件。使用-crc选项复制文件以及CRC信息。
+hadoop fs -put <localsrc> ... <dst>		从本地文件系统中复制单个或多个源路径到目标文件系统。也支持从标准输入中读取输入写入目标文件系统。
+hadoop fs -rmr URI [URI …]		delete的递归版本。
+hadoop fs -test -[ezd] URI	
+选项：
+-e 检查文件是否存在。如果存在则返回0。
+-z 检查文件是否是0字节。如果是则返回0。 
+-d 如果路径是个目录，则返回1，否则返回0。

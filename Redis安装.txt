@@ -1,0 +1,24 @@
+
+Redis 安装
+
+cd /opt
+$ wget http://download.redis.io/releases/redis-5.0.5.tar.gz
+$ tar xzf redis-5.0.5.tar.gz
+$ cd redis-5.0.5
+$ make
+
+执行之后
+$ src/redis-server 查看安装情况；
+ps -ef|grep redis
+
+设置redis访问密码
+vi /opt/redis-5.0.5/redis.conf
+requirepass rikbase
+:wq
+
+重启
+cd /opt/redis-5.0.5
+>src/redis-server &  redis.conf（加& 是为了后台跑redis）
+这时候获取key得到的是(nil)；
+退出
+pkill redis

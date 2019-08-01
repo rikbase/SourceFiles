@@ -1,0 +1,161 @@
+﻿
+centos7
+
+修改主机名	例：hadoop1、hadoop2、hadoop3
+配置host	将命名节点和数据节点的ip和主机名写进来
+配置ssh	
+配置Java环境 jdk1.8	
+解压hadoop包
+配置或替换文件	core-site.xml、hadoop-env.sh、hdfs-site.xml、mapred-site.xml、yarn-site.xml
+配置workers文件（注：3版本之后叫workers,之前叫slaves）
+设置ssh无密码登录
+	ssh-keygen -t rsa //生成公钥（at hadoop1）
+	ssh-copy-id hadoop1 //分发公钥
+	ssh-copy-id hadoop2 //分发公钥
+	ssh-copy-id hadoop3 //分发公钥
+分发hadoop 
+	scp -r hadoop文件全路径 hadoop2:hadoop文件全路径
+	scp -r hadoop文件全路径 hadoop3:hadoop文件全路径
+格式化NameNode
+	$HADOOP_HOME/bin/hdfs namenode -format(注意：每次格式化，都需要将tmp下的文件全部清空)
+启动集群
+	$HADOOP_HOME/sbin/start-all.sh
+
+关闭防火墙：systemctl stop firewalld.service	
+
+查看端口工具：   yum -y install net-tools
+
+
+vi /etc/profile
+
+export SCALA_HOME="/opt/scala-2.12.8"
+export SPARK_HOME="/opt/spark-2.4.0-bin-hadoop2.7"
+export ZOOKEEPER_HOME="/opt/zookeeper-3.4.13"
+export HBASE_HOME="/opt/hbase-2.1.3"
+export PATH=".:$SCALA_HOME/bin:$SPARK_HOME/bin:$ZOOKEEPER_HOME/bin:$HBASE_HOME/bin:$PATH"
+
+
+spark-env.sh 添加
+
+export SCALA_HOME=/opt/scala-2.12.8  
+export JAVA_HOME=/opt/jdk1.8.0_201
+export HADOOP_HOME=/opt/hadoop-3.2.0     
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export SPARK_HOME=/opt/spark-2.4.0-bin-hadoop2.7
+export SPARK_MASTER_IP=master
+export SPARK_EXECUTOR_MEMORY=4G
+
+slaves 添加
+hadoop1
+hadoop2
+hadoop3
+
+mkdir $ZOOKEEPER_HOME/data
+mkdir $ZOOKEEPER_HOME/dataLog
+
+touch $ZOOKEEPER_HOME/data/myid
+vi $ZOOKEEPER_HOME/data/myid        //该步骤分别在hadoop1、hadoop2、hadoop3上修改对应1、2、3
+内容：1
+
+cp $ZOOKEEPER_HOME/conf/zoo_sample.cfg $ZOOKEEPER_HOME/conf/zoo.cfg
+
+
+$HADOOP_HOME/sbin/start-all.sh 启动hadoop集群
+$SPARK_HOME/sbin/start-all.sh   启动spark
+$ZOOKEEPER_HOME/bin/zkServer.sh start 每个节点单独执行
+$ZOOKEEPER_HOME/bin/zkServer.sh status 查看每个节点的状态
+
+hbase-env.sh 添加：
+export JAVA_HOME=/opt/jdk1.8.0_201
+export HADOOP_HOME=/opt/hadoop-3.2.0
+export HBASE_HOME=/opt/hbase-2.1.3
+export HBASE_CLASSPATH=/opt/hadoop-3.2.0/etc/hadoop
+export HBASE_PID_DIR=/opt/hbase-2.1.3/pids
+export HBASE_MANAGES_ZK=false
+
+hbase-site.xml添加配置项：
+
+<property>
+ <name>hbase.rootdir</name>
+ <value>hdfs://hadoop1:9000/hbase</value>
+ <description>The directory shared byregion servers.</description>
+</property>
+ <!-- hbase端口 -->
+<property>
+ <name>hbase.zookeeper.property.clientPort</name>
+ <value>2181</value>
+</property>
+<!-- 超时时间 -->
+<property>
+ <name>zookeeper.session.timeout</name>
+ <value>120000</value>
+</property>
+<!--防止服务器时间不同步出错 -->
+<property>
+<name>hbase.master.maxclockskew</name>
+<value>150000</value>
+</property>
+<!-- 集群主机配置 -->
+<property>
+ <name>hbase.zookeeper.quorum</name>
+ <value>hadoop1,hadoop2,hadoop3</value>
+</property>
+<!--   路径存放 -->
+<property>
+ <name>hbase.tmp.dir</name>
+ <value>/home/hbase/tmp</value>
+</property>
+<!-- true表示分布式 -->
+<property>
+ <name>hbase.cluster.distributed</name>
+ <value>true</value>
+</property>
+<property>
+<name>hbase.unsafe.stream.capability.enforce</name>
+<value>false</value>
+</property>
+  <!-- 指定master -->
+  <property>
+    <name>hbase.master</name>
+    <value>hadoop1:60000</value>
+  </property>
+
+regionservers 添加
+hadoop1
+hadoop2
+hadoop3
+
+
+$HBASE_HOME/bin/start-hbase.sh 
+异常：java.lang.ClassNotFoundException: org.apache.htrace.SamplerBuilder执行下面命令，因为jar包问题
+cp $HBASE_HOME/lib/client-facing-thirdparty/htrace-core-3.1.0-incubating.jar $HBASE_HOME/lib/
+提示信息：
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/hadoop-3.2.0/share/hadoop/common/lib/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/hbase-2.1.3/lib/client-facing-thirdparty/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+执行下面命令，因为jar包问题
+rm -rf /opt/hbase-2.1.3/lib/client-facing-thirdparty/slf4j-log4j12-1.7.25.jar
+
+mysql> create user 'rik_master'@'%' identified by 'rikbase'; //创建用户
+mysql> GRANT SELECT ON rikbase.* TO 'rik_master'@'%'; //远程登录账号、密码、库名
+mysql> flush privileges;
+
+centos7 图形化界面命令：nmtui
+
+hive
+
+wget http://mirror.bit.edu.cn/apache/hive/hive-2.3.4/apache-hive-2.3.4-bin.tar.gz
+
+将hive-default.xml.template重命名为hive-default.xml
+配置文件hive-site.xml并编辑
+在hive-site.xml中写入MySQL配置信息
+
+将hive-env.xml.template重命名为hive-env.xml：
+在hive-env.xml中增加:HADOOP_HOME、HIVE_CONF_DIR、HIVE_AUX_JARS_PATH具体路径；
+下载mysql驱动
+wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.46.tar.gz
+cp mysql-connector-java-5.1.46/mysql-connector-java-5.1.46-bin.jar /usr/local/hive/lib
+
+wget https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.46.tar.gz

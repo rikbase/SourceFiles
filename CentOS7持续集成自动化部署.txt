@@ -1,0 +1,13 @@
+CentOS7持续集成自动化部署
+
+git 安装
+
+配置环境变量
+找到ssh-keygen命令目录
+path 后边+  D:\Program Files\Git\usr\bin
+
+git clone https://github.com/rikbase/rikDubbo.git
+
+git pull https://github.com/rikbase/rikDubbo.git
+git remote add origin https://github.com/rikbase/rikDubbo.git
+

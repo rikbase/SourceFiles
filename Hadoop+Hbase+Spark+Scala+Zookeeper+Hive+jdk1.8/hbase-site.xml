@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+/**
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<configuration>
+<property>
+ <name>hbase.rootdir</name>
+ <value>hdfs://hadoop1:9000/hbase</value>
+ <description>The directory shared byregion servers.</description>
+</property>
+ <!-- hbase端口 -->
+<property>
+ <name>hbase.zookeeper.property.clientPort</name>
+ <value>2181</value>
+</property>
+<!-- 超时时间 -->
+<property>
+ <name>zookeeper.session.timeout</name>
+ <value>120000</value>
+</property>
+<!--防止服务器时间不同步出错 -->
+<property>
+<name>hbase.master.maxclockskew</name>
+<value>150000</value>
+</property>
+<!-- 集群主机配置 -->
+<property>
+ <name>hbase.zookeeper.quorum</name>
+ <value>hadoop1,hadoop2,hadoop3</value>
+</property>
+<!--   路径存放 -->
+<property>
+ <name>hbase.tmp.dir</name>
+ <value>/home/hbase/tmp</value>
+</property>
+<!-- true表示分布式 -->
+<property>
+ <name>hbase.cluster.distributed</name>
+ <value>true</value>
+</property>
+<property>
+ <name>hbase.wal.provider</name>
+ <value>filesystem</value>
+</property>
+<property>
+<name>hbase.unsafe.stream.capability.enforce</name>
+<value>false</value>
+</property>
+  <!-- 指定master -->
+  <property>
+    <name>hbase.master</name>
+    <value>hadoop1:60000</value>
+  </property>
+</configuration>

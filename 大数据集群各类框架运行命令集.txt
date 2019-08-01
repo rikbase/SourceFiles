@@ -1,0 +1,112 @@
+jps查看进程
+
+//Hadoop
+$HADOOP_HOME/sbin/start-all.sh
+$HADOOP_HOME/sbin/stop-all.sh
+
+//hadoop 单启动historyserver
+$HADOOP_HOME/sbin/mr-jobhistory-daemon.sh start historyserver
+
+//ZooKeeper(集群每个节点都执行)
+ssh Hadoop2   
+ssh hadoop3
+退出--- exit
+执行：
+$ZOOKEEPER_HOME/bin/zkServer.sh start
+
+//Hbase
+$HBASE_HOME/bin/start-hbase.sh
+$HBASE_HOME/bin/hbase-daemon.sh start thrift
+
+//MongoDB 安装
+新建 vi /etc/yum.repos.d/mongodb-org-4.0.repo
+----------------------------------------------------
+[mongodb-org-4.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
+---------------------------------------------------
+yum install -y mongodb-org
+yum install libcurl openssl
+
+*************************
+sudo service mongod start
+sudo chkconfig mongod on
+netstat -nltp|grep mongod
+db.version()
+
+----------远程验证连接-------------
+mongo "mongodb://hadoop1:27017/?authSource=admin"
+mongo --username rikbase --password --authenticationDatabase rikbase --host 192.168.233.128 --port 27017
+
+Shell
+use admin
+db.createUser(
+  {
+    user: "root",
+    pwd: "rikbase",
+    roles: [ { role: "dbAdminAnyDatabase", db: "admin" } ]
+  }
+)
+
+sudo service mongod stop
+
+sudo service mongod restart
+//错误解决
+Job for mongod.service failed because the control process exited with error code
+== 切换用户到mongod,将tmp/mongodb-XXXXXX.sock文件删除,重启mongo;
+
+mongo 
+
+-----卸载-------------
+yum erase $(rpm -qa | grep mongodb-org)
+rm -rf /var/lib/mongo
+rm -rf /var/log/mongodb
+
+//Spark
+$SPARK_HOME/sbin/start-all.sh
+
+//HIVE 元组和hive服务发现
+$HIVE_HOME/bin/hive --service metastore &
+$HIVE_HOME/bin/hive --service hiveserver2 &
+
+//HUE(需要切换用户)
+su rikbase
+/opt/hue-cdh5-3.7.0_5.3.6/build/env/bin/supervisor
+-- 退出
+ctrl+C
+
+//Sqoop（数据导入导出 HDFS <===>hive表 ）
+http://sqoop.apache.org/docs/1.4.6/SqoopUserGuide.html
+sqoop help [command] 能显示所有sqoop 可执行操作帮助信息；
+sqoop 执行对应脚本文件
+$ sqoop --options-file 脚本文件路径
+
+//MySql
+mysql -u user -p pwd
+//flume
+//kafka
+http://kafka.apachecn.org/
+
+//oozie
+
+//scala
+
+
+//svn
+svnserve -d -r /opt/svn
+ps -ef|grep svnserve   查看服务端口
+systemctl enable svnserve.service
+
+//nexus
+/opt/nexus-3.15.2-01//bin/nexus start
+
+//ActiveMQ
+修改登录账号密码权限；
+vi /opt/apache-activemq-5.15.9/conf/jetty-realm.properties
+/opt/apache-activemq-5.15.9/bin/activemq start
+/opt/apache-activemq-5.15.9/bin/activemq stop
+/opt/apache-activemq-5.15.9/bin/activemq restart
+
