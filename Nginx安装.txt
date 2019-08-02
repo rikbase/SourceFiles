@@ -2,3 +2,37 @@ negix 安装
 
 yum install gcc-c++
 yum install -y pcre pcre-devel
+yum install -y zlib zlib-devel
+yum install -y openssl openssl-devel
+wget -c https://nginx.org/download/nginx-1.12.0.tar.gz
+
+tar -zxf nginx-1.12.0.tar.gz
+cd nginx-1.12.0
+./configure
+
+make
+make install
+
+#启动
+/usr/local/nginx/sbin/nginx
+#重启
+/usr/local/nginx/sbin/nginx -s reopen
+#停止
+/usr/local/nginx/sbin/nginx -s stop 
+#平滑停止
+/usr/local/nginx/sbin/nginx -s quit
+#检查conf正确性
+/usr/local/nginx/sbin/nginx -t
+#重新载入配置文件
+/usr/local/nginx/sbin/nginx -s reload
+
+查看进程
+ps -ef|grep nginx
+
+浏览器输入 ip地址查看
+
+设置开机启动
+vi /etc/rc.local
+增加一行 /usr/local/nginx/sbin/nginx
+设置执行权限：
+chmod 755 rc.local
