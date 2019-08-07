@@ -4,7 +4,7 @@ yum install gcc-c++
 yum install -y pcre pcre-devel
 yum install -y zlib zlib-devel
 yum install -y openssl openssl-devel
-wget -c https://nginx.org/download/nginx-1.12.0.tar.gz
+wget -c https://nginx.org/download/nginx-1.17.1.tar.gz
 
 tar -zxf nginx-1.12.0.tar.gz
 cd nginx-1.12.0

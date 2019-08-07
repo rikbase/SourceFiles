@@ -1,5 +1,23 @@
 CentOS7持续集成自动化部署
 
+ ssh -T git@github.com
+
+
+安装gitlab
+yum -y install policycoreutils openssh-server openssh-clients postfix policycoreutils-python 
+
+yum install 
+systemctl enable postfix && systemctl start postfix
+wget https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el7/gitlab-ce-11.9.12-ce.0.el7.x86_64.rpm 到清华镜像取最新版本；
+
+rpm -i gitlab-ce-11.9.12-ce.0.el7.x86_64.rpm
+vim  /etc/gitlab/gitlab.rb   -----》 external_url 'http://192.168.233.133:8090'
+
+gitlab-ctl reconfigure
+gitlab-ctl restart
+
+rikbase
+
 安装git在github上找最新版本安装
 大体的安装步骤如下：
 
@@ -26,6 +44,55 @@ export PATH
 ⑧、输入命令 git --version ，查看安装的git版本，校验通过，安装成功。
 
 
+
+创建分支：（位置：.git/config）
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	logallrefupdates = true
+[remote "github-origin"]
+	url = git@github.com:rikbase/rikDubbo.git
+	fetch = +refs/heads/*:refs/remotes/github-origin/*
+[branch "master"]
+	remote = github-origin
+	merge = refs/heads/master
+[remote "origin"]
+	url = git@192.168.233.133:root/rikdubbo.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "gitlabMaster"]
+	remote = origin
+	merge = refs/heads/gitlabMaster
+
+
+#!/bin/sh
+export BUILD_ID=dontkillme
+################################################
+## create by rik at 2019-08-03
+## this scripts is for auto push code to WEB server
+################################################
+#stop server
+/data/apache-tomcat-7.0.96/bin/shutdown.sh
+TPID=`ps -ef|grep rik-tomcat|grep -v grep|awk '{print $2}'`
+TIME=`date +%F`
+INSTALLDIR=/data/apache-tomcat-7.0.96/webapps/
+
+if [ "$TPID" == "" ]
+then
+   echo "rik-tomcat stop sucessfully"
+else
+   kill -9 $TPID
+   sleep 3s
+fi
+rm -rf $INSTALLDIR*
+#push code to server and start server
+cd $INSTALLDIR
+cp -ar /root/.jenkins/workspace/demo/target/*.war $INSTALLDIR
+/data/apache-tomcat-7.0.96/bin/startup.sh
+echo "rik-tomcat start sucessfull"
+
+
+/bin/sh -x /data/script/auto_push.sh
+
 安装jenkins
 wget -O /etc/yum.repos.d/jenkins.repo  http://pkg.jenkins.io/redhat/jenkins.repo
 rpm --import http://pkg.jenkins.io/redhat/jenkins.io.key 
@@ -36,6 +103,34 @@ vi /etc/sysconfig/jenkins
 JENKINS_USER="root"
 JENKINS_PORT="329"
 
+systemctl start jenkins
+
+[root@git ~]# systemctl start jenkins
+Job for jenkins.service failed because the control process exited with error code. See "systemctl status jenkins.service" and "journalctl -xe" for details.
+[root@git ~]# systemctl status jenkins
+● jenkins.service - LSB: Jenkins Automation Server
+   Loaded: loaded (/etc/rc.d/init.d/jenkins; bad; vendor preset: disabled)
+   Active: failed (Result: exit-code) since 一 2018-08-27 14:38:33 CST; 16s ago
+     Docs: man:systemd-sysv-generator(8)
+  Process: 20100 ExecStart=/etc/rc.d/init.d/jenkins start (code=exited, status=1/FAILURE)
+
+8月 27 14:38:33 git systemd[1]: Starting LSB: Jenkins Automation Server...
+8月 27 14:38:33 git runuser[20105]: pam_unix(runuser:session): session opened for user...=0)
+8月 27 14:38:33 git jenkins[20100]: Starting Jenkins bash: /usr/bin/java: 没有那个文件或目录
+8月 27 14:38:33 git runuser[20105]: pam_unix(runuser:session): session closed for user root
+8月 27 14:38:33 git jenkins[20100]: [失败]
+8月 27 14:38:33 git systemd[1]: jenkins.service: control process exited, code=exited s...s=1
+8月 27 14:38:33 git systemd[1]: Failed to start LSB: Jenkins Automation Server.
+8月 27 14:38:33 git systemd[1]: Unit jenkins.service entered failed state.
+8月 27 14:38:33 git systemd[1]: jenkins.service failed.
+Hint: Some lines were ellipsized, use -l to show in full.
+[root@git ~]# which java
+/usr/local/java/bin/java
+[root@git ~]# ln -s /usr/local/java/bin/* /usr/bin/
+[root@git ~]# systemctl start jenkins
+
+systemctl start jenkins
+
 没报错就浏览器
 IP:329访问
 密码验证，选择推荐插件自动安装
@@ -43,4 +138,28 @@ IP:329访问
 service jenkins start
 service jenkins restart
 service jenkins stop
+
+
+
+
+token
+bd25b4a1268f962419f03245d6f3fe85c73a9842
+
+
+systemctl start firewalld.service
+##Add
+firewall-cmd --permanent --zone=public --add-port=8080/tcp
+##Reload
+firewall-cmd --reload
+##检查是否生效
+firewall-cmd --zone=public --query-port=8080/tcp
+
+//查看进程
+ps -ef |grep tomcat 
+//查看启动日志
+cat /data/apache-tomcat-7.0.96/logs/catalina.out
+
+
+
+
 

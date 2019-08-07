@@ -34,3 +34,17 @@ $ chmod 4755                          　 设置用ID，给属主分配读、写
 $ chmod 777 file 						 全部权限
 
 ps -ef|grep svnserve   //查看服务进程
+
+vi /etc/sysconfig/network-scripts/ifcfg-ens33  修改网卡信息
+
+systemctl restart network 重启网络
+
+sudo /etc/init.d/network restart  刷新DNS
+
+hostnamectl set-hostname NewName
+
+ -DskipTests 
+ 
+ 修改系统时间至上海时区
+ rm -rf /etc/localtime
+ ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime

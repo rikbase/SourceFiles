@@ -18,7 +18,7 @@ requirepass rikbase
 
 重启
 cd /opt/redis-5.0.5
->src/redis-server &  redis.conf（加& 是为了后台跑redis）
+>src/redis-server  redis.conf（加& 是为了后台跑redis）
 这时候获取key得到的是(nil)；
 退出
 pkill redis
